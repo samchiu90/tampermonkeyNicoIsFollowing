@@ -125,13 +125,20 @@
         return DuplicateIdsForAcc;
     }
 
-    var FollowText = document.createElement("SPAN");
-    let Styles = document.createAttribute("style");
-    Styles.value = 'padding-inline:0.5rem';
-    FollowText.setAttributeNode(Styles);
 
-    window.addEventListener("load", async (e) => {
-        // All resources finished loading!
+    const AddText = async (e) => {
+        document.getElementById('FollowTextFetched')?.remove();
+        var FollowText = document.createElement("SPAN");
+
+        let Styles = document.createAttribute("style");
+        Styles.value = 'padding-inline:0.5rem';
+        FollowText.setAttributeNode(Styles);
+
+        let Id = document.createAttribute("id");
+        Id.value = 'FollowTextFetched';
+        FollowText.setAttributeNode(Id);
+        FollowText.appendChild(document.createTextNode('Fetching Following...'));
+
         let path = window.location.pathname.split('/');
         console.table(path);
         const genText = async (id = '') => {
@@ -141,18 +148,50 @@
             Object.keys(result).forEach(k => FollowingAc += result[k] ? `${k}, ` : '');
             return FollowingAc;
         }
+
+        let currentId = '';
+        let position;
         if (path[1] === 'user') {
-            let currentId = path[2];
-            let FollowingAc = await genText(currentId);
-            FollowText.appendChild(document.createTextNode(FollowingAc));
-            document.getElementsByClassName('UserDetailsStatus')[0].appendChild(FollowText);
+            currentId = path[2];
+            position = document.getElementsByClassName('UserDetailsStatus')[0];
+
         } else if (path[1] === 'watch') {
             let uploaderPath = document.getElementsByClassName('Link VideoOwnerInfo-pageLink')[0].href.split('/');
-            let currentId = uploaderPath[uploaderPath.length - 1];
-            let FollowingAc = await genText(currentId);
-            FollowText.appendChild(document.createTextNode(FollowingAc));
-            document.getElementsByClassName('HeaderContainer')[0].appendChild(FollowText);
+            currentId = uploaderPath[uploaderPath.length - 1];
+            position = document.getElementsByClassName('HeaderContainer')[0];
+
         }
-    });
+        position?.appendChild(FollowText);
+        let FollowingAc = await genText(currentId);
+        document.getElementById('FollowTextFetched').innerHTML = FollowingAc;
+    }
+
+    var oldHref = document.location.href;
+let loadedFlag = false;
+    window.addEventListener("load", () => {
+        !loadedFlag && AddText();
+         loadedFlag=true;
+        var bodyList = document.querySelector("body")
+
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+
+                if (oldHref != document.location.href) {
+                    oldHref = document.location.href;
+                    /* Changed ! your code here */
+       AddText();
+                }
+            });
+        });
+
+        var config = {
+            childList: true,
+            subtree: true
+        };
+
+        observer.observe(bodyList, config);
+    })
+
+
 
 })();
