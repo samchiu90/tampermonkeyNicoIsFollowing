@@ -167,10 +167,10 @@
     }
 
     var oldHref = document.location.href;
-let loadedFlag = false;
+    let loadedFlag = false;
     window.addEventListener("load", () => {
         !loadedFlag && AddText();
-         loadedFlag=true;
+        loadedFlag = true;
         var bodyList = document.querySelector("body")
 
         var observer = new MutationObserver(function (mutations) {
@@ -179,7 +179,7 @@ let loadedFlag = false;
                 if (oldHref != document.location.href) {
                     oldHref = document.location.href;
                     /* Changed ! your code here */
-       AddText();
+                    AddText();
                 }
             });
         });
